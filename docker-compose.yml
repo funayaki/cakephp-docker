@@ -21,6 +21,19 @@ myapp-mysql:
     - MYSQL_USER=myapp
     - MYSQL_PASSWORD=myapp
 
+myapp-mysql-test:
+  image: mysql:5.7
+  container_name: myapp-mysql-test
+  volumes:
+      - ../mysql-test:/var/lib/mysql
+  ports:
+    - "8107:3306"
+  environment:
+    - MYSQL_ROOT_PASSWORD=root
+    - MYSQL_DATABASE=myapp
+    - MYSQL_USER=myapp
+    - MYSQL_PASSWORD=myapp
+
 myapp-nginx:
   image: phpdockerio/nginx:latest
   container_name: myapp-nginx
@@ -39,9 +52,12 @@ myapp-php-fpm:
   volumes:
     - ../cakephp:/var/www/myapp
     - ./php-fpm/php-ini-overrides.ini:/etc/php/7.1/fpm/conf.d/99-overrides.ini
+  environment:
+    - DATABASE_TEST_URL=mysql://myapp:myapp@myapp-mysql-test/myapp
   links:
     - myapp-mailhog
     - myapp-mysql
+    - myapp-mysql-test
 
 myapp-phpmyadmin:
   image: phpmyadmin/phpmyadmin
